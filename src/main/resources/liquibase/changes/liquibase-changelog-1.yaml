@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: p.marko
+      changes:
+        - createTable:
+            tableName: REPOSITORIES
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_my_repo_id
+              - column:
+                  name: full_name
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: description
+                  type: varchar(200)
+              - column:
+                  name: clone_url
+                  type: varchar(200)
+              - column:
+                  name: stars
+                  type: int
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: owner
+                  type: varchar(100)
+              - column:
+                  name: repo_name
+                  type: varchar(100)
