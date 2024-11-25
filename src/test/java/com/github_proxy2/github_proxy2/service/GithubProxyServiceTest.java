@@ -12,7 +12,6 @@ import com.github_proxy2.github_proxy2.repository.MyRepoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;

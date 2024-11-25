@@ -35,8 +35,6 @@ public class MyRepoServiceTest {
         MyRepo myRepo1 = new MyRepo(1L, "a", "b", "c", 5,
                 LocalDateTime.of(2024, 11, 11, 20, 30, 0),
                 "abc", "x1");
-        MyRepoDto myRepoDto = new MyRepoDto("a", "b", "c", 5,
-                LocalDateTime.of(2024, 11, 11, 20, 30, 0));
 
         when(myRepoRepository.findByOwnerAndRepoName("abc", "x1")).thenReturn(Optional.of(myRepo1));
 

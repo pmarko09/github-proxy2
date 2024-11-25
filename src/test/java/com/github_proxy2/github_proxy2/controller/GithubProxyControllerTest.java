@@ -2,29 +2,19 @@ package com.github_proxy2.github_proxy2.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github_proxy2.github_proxy2.client.GithubProxyClient;
-import com.github_proxy2.github_proxy2.model.dto.GithubProxyDto;
 import com.github_proxy2.github_proxy2.model.dto.MyRepoDto;
-import com.github_proxy2.github_proxy2.model.entity.Owner;
-import com.github_proxy2.github_proxy2.repository.MyRepoRepository;
 import com.github_proxy2.github_proxy2.service.GithubProxyService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
