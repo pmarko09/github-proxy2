@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface RepoRepository extends JpaRepository<Repo, Long> {
 
-    @Query("SELECT r FROM MyRepo r WHERE r.owner = :owner AND r.repoName = :repoName")
+    @Query("SELECT r FROM Repo r WHERE r.owner = :owner AND r.repoName = :repoName")
     Optional<Repo> findByOwnerAndRepoName(@Param("owner") String owner, @Param("repoName") String repoName);
 }
