@@ -1,11 +1,11 @@
 package com.github_proxy2.github_proxy2.service;
 
 import com.github_proxy2.github_proxy2.client.GithubProxyClient;
-import com.github_proxy2.github_proxy2.mapper.MyRepoMapper;
-import com.github_proxy2.github_proxy2.model.dto.GithubProxyDto;
-import com.github_proxy2.github_proxy2.model.dto.MyRepoDto;
-import com.github_proxy2.github_proxy2.model.entity.MyRepo;
-import com.github_proxy2.github_proxy2.repository.MyRepoRepository;
+import com.github_proxy2.github_proxy2.mapper.RepoMapper;
+import com.github_proxy2.github_proxy2.model.dto.GithubRepositoryDto;
+import com.github_proxy2.github_proxy2.model.dto.RepoDto;
+import com.github_proxy2.github_proxy2.model.entity.Repo;
+import com.github_proxy2.github_proxy2.repository.RepoRepository;
 import com.github_proxy2.github_proxy2.validation.RepositoryValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,33 +15,33 @@ import org.springframework.stereotype.Service;
 public class GithubProxyService {
 
     private final GithubProxyClient githubProxyClient;
-    private final MyRepoRepository myRepoRepository;
-    private final MyRepoMapper mapper;
+    private final RepoRepository repoRepository;
+    private final RepoMapper mapper;
 
-    public MyRepoDto getRepoFromGithub(String owner, String repo) {
-        GithubProxyDto response = githubProxyClient.getRepo(owner, repo);
+    public RepoDto getRepoFromGithub(String owner, String repo) {
+        GithubRepositoryDto response = githubProxyClient.getRepo(owner, repo);
 
-        return MyRepoDto.create(response);
+        return RepoDto.create(response);
     }
 
-    public MyRepoDto saveRepoLocally(String owner, String repo) {
-        GithubProxyDto response = githubProxyClient.getRepo(owner, repo);
+    public RepoDto saveRepoLocally(String owner, String repo) {
+        GithubRepositoryDto response = githubProxyClient.getRepo(owner, repo);
 
-        RepositoryValidation.repoExistsLocally(myRepoRepository, owner, repo);
-        MyRepo myRepo = MyRepo.createMyRepo(response);
-        MyRepo savedRepo = myRepoRepository.save(myRepo);
+        RepositoryValidation.repoExistsLocally(repoRepository, owner, repo);
+        Repo myRepo = Repo.createMyRepo(response);
+        Repo savedRepo = repoRepository.save(myRepo);
 
         return mapper.toDto(savedRepo);
     }
 
-    public MyRepoDto editRepo(String owner, String repo, MyRepoDto editedRepo) {
-        MyRepo existingRepo = RepositoryValidation.repoFound(myRepoRepository, owner, repo);
-        MyRepo.edit(existingRepo, editedRepo);
-        return mapper.toDto(myRepoRepository.save(existingRepo));
+    public RepoDto editRepo(String owner, String repo, RepoDto editedRepo) {
+        Repo existingRepo = RepositoryValidation.repoFound(repoRepository, owner, repo);
+        Repo.edit(existingRepo, editedRepo);
+        return mapper.toDto(repoRepository.save(existingRepo));
     }
 
     public void deleteRepo(String owner, String repo) {
-        MyRepo existingRepo = RepositoryValidation.repoFound(myRepoRepository, owner, repo);
-        myRepoRepository.delete(existingRepo);
+        Repo existingRepo = RepositoryValidation.repoFound(repoRepository, owner, repo);
+        repoRepository.delete(existingRepo);
     }
 }

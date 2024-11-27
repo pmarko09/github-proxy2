@@ -3,16 +3,15 @@ package com.github_proxy2.github_proxy2.service;
 import com.github_proxy2.github_proxy2.client.GithubProxyClient;
 import com.github_proxy2.github_proxy2.exception.RepositoryAlreadyExistsException;
 import com.github_proxy2.github_proxy2.exception.RepositoryNotFoundException;
-import com.github_proxy2.github_proxy2.mapper.MyRepoMapper;
-import com.github_proxy2.github_proxy2.model.dto.GithubProxyDto;
-import com.github_proxy2.github_proxy2.model.dto.MyRepoDto;
-import com.github_proxy2.github_proxy2.model.entity.MyRepo;
+import com.github_proxy2.github_proxy2.mapper.RepoMapper;
+import com.github_proxy2.github_proxy2.model.dto.GithubRepositoryDto;
+import com.github_proxy2.github_proxy2.model.dto.RepoDto;
+import com.github_proxy2.github_proxy2.model.entity.Repo;
 import com.github_proxy2.github_proxy2.model.entity.Owner;
-import com.github_proxy2.github_proxy2.repository.MyRepoRepository;
+import com.github_proxy2.github_proxy2.repository.RepoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
@@ -26,28 +25,28 @@ import static org.mockito.ArgumentMatchers.any;
 public class GithubProxyServiceTest {
 
     GithubProxyClient githubProxyClient;
-    MyRepoRepository myRepoRepository;
-    MyRepoMapper mapper;
+    RepoRepository repoRepository;
+    RepoMapper mapper;
     GithubProxyService service;
 
     @BeforeEach
     void setup() {
         this.githubProxyClient = Mockito.mock(GithubProxyClient.class);
-        this.myRepoRepository = Mockito.mock(MyRepoRepository.class);
-        this.mapper = Mappers.getMapper(MyRepoMapper.class);
-        this.service = new GithubProxyService(githubProxyClient, myRepoRepository,
+        this.repoRepository = Mockito.mock(RepoRepository.class);
+        this.mapper = Mappers.getMapper(RepoMapper.class);
+        this.service = new GithubProxyService(githubProxyClient, repoRepository,
                 mapper);
     }
 
     @Test
     void getRepoFromGithub_DataCorrect_MyRepoDtoReturned() {
         Owner owner = new Owner("axa");
-        GithubProxyDto dto = new GithubProxyDto("a", "aa", "aaa",
+        GithubRepositoryDto dto = new GithubRepositoryDto("a", "aa", "aaa",
                 5, LocalDateTime.of(2020, 12, 12, 12, 12, 12),
                 owner, "b");
         when(githubProxyClient.getRepo(owner.getLogin(), "b")).thenReturn(dto);
 
-        MyRepoDto result = service.getRepoFromGithub("axa", "b");
+        RepoDto result = service.getRepoFromGithub("axa", "b");
 
         assertNotNull(result);
         assertEquals("a", result.getFullName());
@@ -60,41 +59,41 @@ public class GithubProxyServiceTest {
     void saveRepoLocally_DataCorrect_MyRepoDtoReturned() {
         Owner owner = new Owner("axa");
 
-        MyRepo myRepo = new MyRepo();
-        myRepo.setFullName("a");
-        myRepo.setDescription("aa");
-        myRepo.setCloneUrl("aaa");
-        myRepo.setStars(5);
-        myRepo.setOwner("axa");
-        myRepo.setRepoName("b");
+        Repo repo = new Repo();
+        repo.setFullName("a");
+        repo.setDescription("aa");
+        repo.setCloneUrl("aaa");
+        repo.setStars(5);
+        repo.setOwner("axa");
+        repo.setRepoName("b");
 
-        GithubProxyDto dto = new GithubProxyDto("a", "aa", "aaa", 5,
+        GithubRepositoryDto dto = new GithubRepositoryDto("a", "aa", "aaa", 5,
                 LocalDateTime.of(2020, 12, 12, 12, 12, 12), owner, "b");
 
         when(githubProxyClient.getRepo("axa", "b")).thenReturn(dto);
-        when(myRepoRepository.save(any(MyRepo.class))).thenReturn(myRepo);
+        when(repoRepository.save(any(Repo.class))).thenReturn(repo);
 
-        MyRepoDto result = service.saveRepoLocally("axa", "b");
+        RepoDto result = service.saveRepoLocally("axa", "b");
 
         assertNotNull(result);
         assertEquals("a", result.getFullName());
         assertEquals("aa", result.getDescription());
         assertEquals("aaa", result.getCloneUrl());
         assertEquals(5, result.getStars());
-        verify(myRepoRepository).save(any(MyRepo.class));
+        verify(repoRepository).save(any(Repo.class));
     }
 
     @Test
     void saveRepoLocally_RepoAlreadyExists_ThrowException() {
-        MyRepo myRepo = new MyRepo();
-        myRepo.setFullName("a");
-        myRepo.setDescription("aa");
-        myRepo.setCloneUrl("aaa");
-        myRepo.setStars(5);
-        myRepo.setOwner("x");
-        myRepo.setRepoName("x1");
+        Repo repo = new Repo();
+        repo.setFullName("a");
+        repo.setDescription("aa");
+        repo.setCloneUrl("aaa");
+        repo.setStars(5);
+        repo.setOwner("x");
+        repo.setRepoName("x1");
 
-        when(myRepoRepository.findByOwnerAndRepoName("x", "x1")).thenReturn(Optional.of(myRepo));
+        when(repoRepository.findByOwnerAndRepoName("x", "x1")).thenReturn(Optional.of(repo));
 
         RepositoryAlreadyExistsException aThrows = assertThrows(RepositoryAlreadyExistsException.class, () ->
                 service.saveRepoLocally("x", "x1"));
@@ -103,15 +102,15 @@ public class GithubProxyServiceTest {
 
     @Test
     void editRepo_DataCorrect_MyRepoDtoReturned() {
-        MyRepo myRepo = new MyRepo();
-        myRepo.setFullName("a");
-        myRepo.setDescription("aa");
-        myRepo.setCloneUrl("aaa");
-        myRepo.setStars(5);
-        myRepo.setOwner("axa");
-        myRepo.setRepoName("b");
+        Repo repo = new Repo();
+        repo.setFullName("a");
+        repo.setDescription("aa");
+        repo.setCloneUrl("aaa");
+        repo.setStars(5);
+        repo.setOwner("axa");
+        repo.setRepoName("b");
 
-        MyRepo updated = new MyRepo();
+        Repo updated = new Repo();
         updated.setFullName("a1");
         updated.setDescription("aa1");
         updated.setCloneUrl("aaa1");
@@ -119,62 +118,62 @@ public class GithubProxyServiceTest {
         updated.setOwner("axa");
         updated.setRepoName("b");
 
-        MyRepoDto myRepoDto = new MyRepoDto();
-        myRepoDto.setFullName("a");
-        myRepoDto.setDescription("aa");
-        myRepoDto.setCloneUrl("aaa");
-        myRepoDto.setStars(5);
+        RepoDto repoDto = new RepoDto();
+        repoDto.setFullName("a");
+        repoDto.setDescription("aa");
+        repoDto.setCloneUrl("aaa");
+        repoDto.setStars(5);
 
-        when(myRepoRepository.findByOwnerAndRepoName("axa", "b")).thenReturn(Optional.of(myRepo));
-        when(myRepoRepository.save(myRepo)).thenReturn(updated);
+        when(repoRepository.findByOwnerAndRepoName("axa", "b")).thenReturn(Optional.of(repo));
+        when(repoRepository.save(repo)).thenReturn(updated);
 
-        MyRepoDto result = service.editRepo("axa", "b", myRepoDto);
+        RepoDto result = service.editRepo("axa", "b", repoDto);
 
         assertNotNull(result);
         assertEquals("a1", result.getFullName());
         assertEquals("aa1", result.getDescription());
         assertEquals("aaa1", result.getCloneUrl());
         assertEquals(51, result.getStars());
-        verify(myRepoRepository).findByOwnerAndRepoName("axa", "b");
-        verify(myRepoRepository).save(myRepo);
+        verify(repoRepository).findByOwnerAndRepoName("axa", "b");
+        verify(repoRepository).save(repo);
     }
 
     @Test
     void editRepo_RepoNotFound_ThrowException() {
-        MyRepoDto myRepoDto = new MyRepoDto();
-        myRepoDto.setFullName("a");
-        myRepoDto.setDescription("aa");
-        myRepoDto.setCloneUrl("aaa");
-        myRepoDto.setStars(5);
+        RepoDto repoDto = new RepoDto();
+        repoDto.setFullName("a");
+        repoDto.setDescription("aa");
+        repoDto.setCloneUrl("aaa");
+        repoDto.setStars(5);
 
-        when(myRepoRepository.findByOwnerAndRepoName("a", "b")).thenReturn(Optional.empty());
+        when(repoRepository.findByOwnerAndRepoName("a", "b")).thenReturn(Optional.empty());
 
         RepositoryNotFoundException aThrows = assertThrows(RepositoryNotFoundException.class, () ->
-                service.editRepo("a", "b", myRepoDto));
+                service.editRepo("a", "b", repoDto));
         assertEquals("Repository not found.", aThrows.getMessage());
     }
 
     @Test
     void deleteRepo_DataCorrect_Void() {
-        MyRepo myRepo = new MyRepo();
-        myRepo.setFullName("a");
-        myRepo.setDescription("aa");
-        myRepo.setCloneUrl("aaa");
-        myRepo.setStars(5);
-        myRepo.setOwner("axa");
-        myRepo.setRepoName("b");
+        Repo repo = new Repo();
+        repo.setFullName("a");
+        repo.setDescription("aa");
+        repo.setCloneUrl("aaa");
+        repo.setStars(5);
+        repo.setOwner("axa");
+        repo.setRepoName("b");
 
-        when(myRepoRepository.findByOwnerAndRepoName("axa", "b")).thenReturn(Optional.of(myRepo));
+        when(repoRepository.findByOwnerAndRepoName("axa", "b")).thenReturn(Optional.of(repo));
 
         service.deleteRepo("axa", "b");
 
-        verify(myRepoRepository).findByOwnerAndRepoName("axa", "b");
-        verify(myRepoRepository).delete(myRepo);
+        verify(repoRepository).findByOwnerAndRepoName("axa", "b");
+        verify(repoRepository).delete(repo);
     }
 
     @Test
     void deleteRepo_RepoNotFound_ExceptionThrown() {
-        when(myRepoRepository.findByOwnerAndRepoName("axa", "b")).thenReturn(Optional.empty());
+        when(repoRepository.findByOwnerAndRepoName("axa", "b")).thenReturn(Optional.empty());
 
         RepositoryNotFoundException aThrows = assertThrows(RepositoryNotFoundException.class, () ->
                 service.deleteRepo("axa", "b"));

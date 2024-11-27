@@ -1,10 +1,10 @@
 package com.github_proxy2.github_proxy2.service;
 
 import com.github_proxy2.github_proxy2.exception.RepositoryNotFoundException;
-import com.github_proxy2.github_proxy2.mapper.MyRepoMapper;
-import com.github_proxy2.github_proxy2.model.dto.MyRepoDto;
-import com.github_proxy2.github_proxy2.model.entity.MyRepo;
-import com.github_proxy2.github_proxy2.repository.MyRepoRepository;
+import com.github_proxy2.github_proxy2.mapper.RepoMapper;
+import com.github_proxy2.github_proxy2.model.dto.RepoDto;
+import com.github_proxy2.github_proxy2.model.entity.Repo;
+import com.github_proxy2.github_proxy2.repository.RepoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -17,41 +17,39 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MyRepoServiceTest {
+public class RepoServiceTest {
 
-    MyRepoRepository myRepoRepository;
-    MyRepoMapper mapper;
-    MyRepoService service;
+    RepoRepository repoRepository;
+    RepoMapper mapper;
+    RepoService service;
 
     @BeforeEach
     void setup() {
-        this.myRepoRepository = Mockito.mock(MyRepoRepository.class);
-        this.mapper = Mappers.getMapper(MyRepoMapper.class);
-        this.service = new MyRepoService(myRepoRepository, mapper);
+        this.repoRepository = Mockito.mock(RepoRepository.class);
+        this.mapper = Mappers.getMapper(RepoMapper.class);
+        this.service = new RepoService(repoRepository, mapper);
     }
 
     @Test
     void getRepoFromLocal_DataCorrect_MyRepoDtoReturned() {
-        MyRepo myRepo1 = new MyRepo(1L, "a", "b", "c", 5,
+        Repo repo1 = new Repo(1L, "a", "b", "c", 5,
                 LocalDateTime.of(2024, 11, 11, 20, 30, 0),
                 "abc", "x1");
-        MyRepoDto myRepoDto = new MyRepoDto("a", "b", "c", 5,
-                LocalDateTime.of(2024, 11, 11, 20, 30, 0));
 
-        when(myRepoRepository.findByOwnerAndRepoName("abc", "x1")).thenReturn(Optional.of(myRepo1));
+        when(repoRepository.findByOwnerAndRepoName("abc", "x1")).thenReturn(Optional.of(repo1));
 
-        MyRepoDto result = service.getRepoFromLocal("abc", "x1");
+        RepoDto result = service.getRepoFromLocal("abc", "x1");
 
         assertNotNull(result);
         assertEquals("a", result.getFullName());
         assertEquals("c", result.getCloneUrl());
         assertEquals(5, result.getStars());
-        verify(myRepoRepository).findByOwnerAndRepoName("abc", "x1");
+        verify(repoRepository).findByOwnerAndRepoName("abc", "x1");
     }
 
     @Test
     void getRepoFromLocal_RepoNotFound_ThrowException() {
-        when(myRepoRepository.findByOwnerAndRepoName("abc", "x1")).thenReturn(Optional.empty());
+        when(repoRepository.findByOwnerAndRepoName("abc", "x1")).thenReturn(Optional.empty());
 
         RepositoryNotFoundException aThrows = assertThrows(RepositoryNotFoundException.class, () ->
                 service.getRepoFromLocal("abc", "x1)"));

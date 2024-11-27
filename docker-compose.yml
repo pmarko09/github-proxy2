@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: github-proxy2-app
+    container_name: github-proxy-app
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/gitproxydb
       SPRING_DATASOURCE_USERNAME: user1

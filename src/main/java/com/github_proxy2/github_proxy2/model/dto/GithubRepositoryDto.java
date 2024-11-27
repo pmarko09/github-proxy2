@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GithubProxyDto {
+public class GithubRepositoryDto {
 
     @JsonProperty("full_name")
     private String fullName;
